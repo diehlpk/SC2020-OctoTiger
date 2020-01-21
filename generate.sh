@@ -1,0 +1,27 @@
+#!/usr/bin/bash
+
+#Config
+EXECUTABLE=
+PROGRAM_ARGS=""
+HPX_ARGS="--hpx:ini=hpx.stacks.use_guard_pages=0 --hpx:bind=numa-balanced --hpx:options-file=../agas-pfx-counters.cfg"
+
+
+for l in {13..13}
+do
+
+    mkdir -p level_${l}
+cat << _EOF_ > level_${l}/submit-job.sh
+#!/bin/bash
+#SBATCH --job-name=Octotiger_Level_${l}
+#SBATCH --output=slurm.out
+#SBATCH --error=slurm.err
+#SBATCH --nodes=${NODES}
+#SBATCH --time=${TIME}
+
+
+echo "$(date +%H:%M:%S) launching octotiger"
+srun -n ${EXECUTABLE} ${PROGRAM_ARGS} ${HPX_ARGS} 
+_EOF_
+
+chmod a+x level_${l}/submit-job.sh
+done
