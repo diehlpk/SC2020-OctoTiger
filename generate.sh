@@ -18,6 +18,9 @@ cat << _EOF_ > level_${l}/submit-job.sh
 #SBATCH --nodes=${NODES}
 #SBATCH --time=${TIME}
 
+echo "Activate APEX"
+APEX_SCREEN_OUTPUT=0
+APEX_CSV_OUTPUT=1
 
 echo "$(date +%H:%M:%S) launching octotiger"
 srun -n ${EXECUTABLE} ${PROGRAM_ARGS} ${HPX_ARGS} 
