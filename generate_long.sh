@@ -1,7 +1,13 @@
 #!/usr/bin/bash
 
+#   Copyright (c) 2020 Patrick Diehl
+#
+#   Distributed under the Boost Software License, Version 1.0. (See accompanying
+#   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+
 #Config
-EXECUTABLE=
+EXECUTABLE=""
 PROGRAM_ARGS=""
 HPX_ARGS="--hpx:ini=hpx.stacks.use_guard_pages=0 --hpx:bind=numa-balanced --hpx:options-file=../agas-pfx-counters.cfg"
 
