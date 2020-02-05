@@ -7,10 +7,11 @@
 
 
 #Config
-EXECUTABLE=""
 PROGRAM_ARGS=""
 HPX_ARGS="--hpx:ini=hpx.stacks.use_guard_pages=0 --hpx:bind=numa-balanced --hpx:options-file=../agas-pfx-counters.cfg"
 
+set -x
+source /project/projectdirs/xpress/sc2020/load_octo.sh
 
 for l in {13..13}
 do
@@ -23,6 +24,9 @@ cat << _EOF_ > level_${l}/submit-job.sh
 #SBATCH --error=slurm.err
 #SBATCH --nodes=${NODES}
 #SBATCH --time=${TIME}
+#SBATCH --ntasks-per-node=32
+#SBATCH --constraint=haswell
+#SBATCH -A xpress
 
 echo "Activate APEX"
 APEX_SCREEN_OUTPUT=0

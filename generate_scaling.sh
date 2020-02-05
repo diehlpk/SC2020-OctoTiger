@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 #   Copyright (c) 2020 Patrick Diehl
 #
@@ -7,29 +7,26 @@
 
 
 #Config
-EXECUTABLE=""
-PROGRAM_ARGS=""
-HPX_ARGS="--hpx:ini=hpx.stacks.use_guard_pages=0 --hpx:bind=numa-balanced --hpx:options-file=../../agas-pfx-counters.cfg"
-TIME=01:00:00
-
+HPX_ARGS="--hpx:localities \$SLURM_JOB_NUM_NODES  --hpx:ini=hpx.stacks.use_guard_pages=0 --hpx:bind=numa-balanced --hpx:options-file=../../agas-pfx-counters.cfg"
+TIME=00:30:00
 
 mkdir -p scaling
 cd scaling
 
-for LEVEL in 1 2 3
+for LEVEL in 10 11 12
 do
-    if [ "$LEVEL" == 1 ]; then
+    if [ "$LEVEL" == 10 ]; then
         N1=0 # 2^0 = 1
         N2=1 # 2^  =
-    elif [ "$LEVEL" == 2  ]; then
+    elif [ "$LEVEL" == 11  ]; then
         N1=0
         N2=1
-    elif [ "$LEVEL" == 3 ]; then
+    elif [ "$LEVEL" == 12 ]; then
         N1=0
         N2=1
     fi
 
-    for NPOWER in $(seq $N1 1 $N2)
+    for NPOWER in $(seq $N1 $N2)
     do
         NODES=$(( 2 ** $NPOWER))
 
@@ -41,12 +38,27 @@ cat << _EOF_ > level_${LEVEL}_${NODES}/submit-job.sh
 #SBATCH --error=slurm.err
 #SBATCH --nodes=${NODES}
 #SBATCH --time=${TIME}
+#SBATCH --ntasks-per-node=32
+#SBATCH --constraint=haswell
+#SBATCH -A xpress
+#SBATCH --mail-type=begin,end,fail
+#SBATCH --mail-user=patrickdiehl@lsu.edu
+#SBATCH --qos=debug
+
+set -x
+source /project/projectdirs/xpress/sc2020/load_octo.sh
+
+echo "Activate APEX"
+APEX_SCREEN_OUTPUT=0
+APEX_CSV_OUTPUT=1
 
 
 echo "$(date +%H:%M:%S) launching octotiger"
-srun -n ${EXECUTABLE} ${PROGRAM_ARGS} ${HPX_ARGS} 
+srun -N \${SLURM_JOB_NUM_NODES} -n \${SLURM_JOB_NUM_NODES} -c 2 \$OCTOPATH/octotiger --config_file=rcb.ini ${HPX_ARGS} 
 _EOF_
 
-chmod a+x level_${LEVEL}_${NODES}/submit-job.sh
+cp -r ../rcb${LEVEL}/* level_${LEVEL}_${NODES}/  
+
+chmod a+x level_${LEVEL}_${NODES}/submit-job.sh 
 done
 done
