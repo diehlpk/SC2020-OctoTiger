@@ -8,6 +8,7 @@
 
 #Config
 HPX_ARGS="--hpx:localities \$SLURM_JOB_NUM_NODES  --hpx:ini=hpx.stacks.use_guard_pages=0 --hpx:bind=numa-balanced --hpx:options-file=../../agas-pfx-counters.cfg"
+FAB_ENABLE="-Ihpx.parcel.libfabric.enable=1 -Ihpx.parcel.bootstrap=libfabric -Ihpx.parcel.message_handlers=0"
 TIME=00:30:00
 
 mkdir -p scaling
@@ -49,12 +50,12 @@ set -x
 source /project/projectdirs/xpress/sc2020/load_octo.sh
 
 echo "Activate APEX"
-APEX_SCREEN_OUTPUT=0
-APEX_CSV_OUTPUT=1
+export APEX_SCREEN_OUTPUT=0
+export APEX_CSV_OUTPUT=1
 
 
 echo "$(date +%H:%M:%S) launching octotiger"
-srun -N \${SLURM_JOB_NUM_NODES} -n \${SLURM_JOB_NUM_NODES} -c 2 \$OCTOPATH/octotiger --config_file=rcb.ini ${HPX_ARGS} 
+srun -N \${SLURM_JOB_NUM_NODES} -n \${SLURM_JOB_NUM_NODES} -c 32 --cpu_bind=cores \$OCTOPATH/octotiger --config_file=rcb.ini ${HPX_ARGS} ${FAB_ENABLE} 
 _EOF_
 
 cp -r ../rcb${LEVEL}/* level_${LEVEL}_${NODES}/  
