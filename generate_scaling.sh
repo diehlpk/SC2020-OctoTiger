@@ -23,8 +23,8 @@ do
         N1=6 # 2^6 = 64
         N2=10 # 2^10 = 1024
     elif [ "$LEVEL" == 12 ]; then
-        N1=0
-        N2=1
+        N1=10
+        N2=13
     fi
 
     for NPOWER in $(seq $N1 $N2)
@@ -52,10 +52,14 @@ echo "Activate APEX"
 export APEX_SCREEN_OUTPUT=0
 export APEX_CSV_OUTPUT=1
 
+echo "$(date +%H:%M:%S) splitting files"
+srun -N \${SLURM_JOB_NUM_NODES} -n \${SLURM_JOB_NUM_NODES} -c 32 --cpu_bind=cores \$OCTOPATH/octotiger --config_file=rcb_init.ini --silo_num_groups=\$SLURM_JOB_NUM_NODES ${HPX_ARGS}
+
 
 echo "$(date +%H:%M:%S) launching octotiger"
 ./copy_restart.sh
-srun -N \${SLURM_JOB_NUM_NODES} -n \${SLURM_JOB_NUM_NODES} -c 32 --cpu_bind=cores \$OCTOPATH/octotiger --config_file=rcb.ini ${HPX_ARGS} ${FAB_ENABLE} 
+rm -rf X.scf.*
+srun -N \${SLURM_JOB_NUM_NODES} -n \${SLURM_JOB_NUM_NODES} -c 32 --cpu_bind=cores \$OCTOPATH/octotiger --config_file=rcb.ini --silo_num_groups=\$SLURM_JOB_NUM_NODES  ${HPX_ARGS} ${FAB_ENABLE} 
 _EOF_
 
 cp -r ../rcb${LEVEL}/* level_${LEVEL}_${NODES}/  

@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 #   Copyright (c) 2020 Patrick Diehl
 #
@@ -9,32 +9,36 @@
 #Config
 PROGRAM_ARGS=""
 HPX_ARGS="--hpx:ini=hpx.stacks.use_guard_pages=0 --hpx:bind=numa-balanced --hpx:options-file=../agas-pfx-counters.cfg"
+FAB_ENABLE=
 
-set -x
-source /project/projectdirs/xpress/sc2020/load_octo.sh
-
-for l in {13..13}
+for LEVEL in {10..12}
 do
 
-    mkdir -p level_${l}
-cat << _EOF_ > level_${l}/submit-job.sh
+    mkdir -p level_${LEVEL}
+cat << _EOF_ > level_${LEVEL}/submit-job.sh
 #!/bin/bash
-#SBATCH --job-name=Octotiger_Level_${l}
+#SBATCH --job-name=Octotiger_Level_${LEVEL}
 #SBATCH --output=slurm.out
 #SBATCH --error=slurm.err
-#SBATCH --nodes=${NODES}
-#SBATCH --time=${TIME}
-#SBATCH --ntasks-per-node=32
+#SBATCH --nodes=32
+#SBATCH --time=24:00:00
 #SBATCH --constraint=haswell
 #SBATCH -A xpress
+#SBATCH --qos=regular
+
+echo #Load paths"
+source /project/projectdirs/xpress/sc2020/load_octoMPI.sh
 
 echo "Activate APEX"
 APEX_SCREEN_OUTPUT=0
 APEX_CSV_OUTPUT=1
 
+./copy_restart.sh
 echo "$(date +%H:%M:%S) launching octotiger"
-srun -n ${EXECUTABLE} ${PROGRAM_ARGS} ${HPX_ARGS} 
+srun -N \${SLURM_JOB_NUM_NODES} -n \${SLURM_JOB_NUM_NODES} -c 32 --cpu_bind=cores \$OCTOPATH/octotiger --config_file=rcb.ini ${HPX_ARGS} ${FAB_ENABLE} 
 _EOF_
 
-chmod a+x level_${l}/submit-job.sh
+cp -r rcb${LEVEL}/* level_${LEVEL}/  
+chmod a+x level_${LEVEL}/submit-job.sh 
+
 done
