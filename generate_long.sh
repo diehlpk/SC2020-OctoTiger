@@ -8,7 +8,7 @@
 
 #Config
 PROGRAM_ARGS=""
-HPX_ARGS="--hpx:ini=hpx.stacks.use_guard_pages=0 --hpx:bind=numa-balanced --hpx:options-file=../agas-pfx-counters.cfg"
+HPX_ARGS="--hpx:ini=hpx.stacks.use_guard_pages=0 --hpx:bind=numa-balanced --hpx:options-file=../agas-pfx-counters.cfg --hpx:print-counter-interval=3600000"
 FAB_ENABLE=
 
 for LEVEL in {10..12}
