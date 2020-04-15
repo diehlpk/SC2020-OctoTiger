@@ -17,7 +17,7 @@ def get_line(filename, word, last_line=-1):
 nthreads = [1,2,4,8,16,32,64,128,256,512,1024]#,80,160,320,640,1280]
 
 paths = ["scaling/level_10_", "scaling/level_11_","./scaling/level_12_","./scaling_hpx_apex/level_10_","./scaling_no_apex/level_10_","./scaling_pure_hpx/level_10_"]
-paths = ["./scaling_old/level_10_","./scaling_old/level_11_","./scaling/level_12_"]
+paths = ["./scaling_old/level_10_","./scaling_old/level_11_"]#,"./scaling/level_12_"]
 colors = ['-k^', '--ko', '-.kP', '--kP', '-.kp', ':ko', '-ko', '-k^']
 titles = ['level 10', 'level 11', 'level 12', 'level 10 (II)', 'level 10 (III)','level 10 (IV)','Octo-QueenBee: angle 0', 'Octo-QueenBee: angle 0, AM off', 'Octo-BigRed: angle 0, try2', 'Octo-BigRed: angle 0, half-full node', 'Octo-BigRed: angle 0, hpx-without guard', 'Octo-BigRed: angle 0, AM off without guard',]
 minValue = [1, 64, 1024, 1, 1, 1, 1024, 16, 64, 64]
@@ -183,28 +183,31 @@ print 'leafs subgrids: ', leafs
 
 plt.close()
 fig = plt.figure(figsize=(8, 6))
-ax = plt.axes([0.15,0.15,0.8,0.8])
+ax = plt.axes([0.01,0.01,0.95,0.95])
 ax.tick_params(direction='in', length=6, width=2, colors='black',bottom=True, top=True, left=True, right=True)
 plt.rc('font', family='serif',size=28)
 plt.rc('text', usetex=True)
 plt.rc('xtick', labelsize=30)
 plt.rc('ytick', labelsize=30)
+ax.set_xscale('symlog', basex=2)
 plt.grid(True)
 #ax.set_xscale('symlog', basex=2)
 #ax.set_yscale('symlog', basey=2)
 
 for i in range(0, len(paths)):
-    if ('level_10' in paths[i]) and (grids[i] == 0):
-        grids[i] = 23709
+   # if ('level_10' in paths[i]) and (grids[i] == 0):
+   #     grids[i] = 23709
     plt.plot(np.array(all_threads[i]), grids[i] / np.array(Octo_times[i]), colors[i], label=titles[i])
 #plt.axvline(x=32, color='r', linestyle='-.')
 #plt.axvline(x=20, color='g')
 plt.xlabel(r'$\#$ nodes')
-plt.ylabel('subgrids per sec')
+plt.ylabel('Subgrids per Second')
 #if compstr=="total" and plotref == 256:
 plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15),
           fancybox=True, shadow=True, ncol=2, numpoints=1)
 #plt.xlim(0.8,40)
+plt.xticks([4, 32, 256], ['$2^2$', '$2^5$', '$2^8$'])
+#ax.set_xscale('symlog', basex=2)
 plt.savefig('grids_per_sec'+savename+'.eps', bbox_inches="tight")
 os.system('epspdf '+'grids_per_sec'+savename+'.eps '+'grids_per_sec'+savename+'.pdf')
 
